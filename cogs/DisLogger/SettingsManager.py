@@ -65,10 +65,12 @@ class SettingsManager:
 					}
 				},
 
+				"######": "#############################################################################",
 				"#info#": "###         THE ARGUMENT NEEDED TO CREATE AN INSTANCE OF 'TYPE'.          ###",
 				"#inf0#": "### THINGS. THE TYPE IS THE NAME OF THE MONITOR CLASS, AND CONFIG CONTAINS###",
 				"#infu#": "### RUNS IN A SEPARATE THREAD AND IS WHAT CALLS THE LOGGER TO ACTUALLY LOG###",
 				"#infO#": "### HERE YOU SPECIFY THE INSTANCES OF MONITORS YOU WISH TO USE. A MONITOR ###",
+				"###O##": "#############################################################################",
             },
 
 			"loggers": {
@@ -85,7 +87,7 @@ class SettingsManager:
 						"handler1": "DiscordHandlerOtherChannel"
 					}
 				},
-
+				"######": "#############################################################################",
 				"#info#": "###            IF YOU DON'T KNOW WHAT IT IS, KEEP IT AT 20.               ###",
 				"#inf*#": "###  HERE: https://docs.python.org/3/library/logging.html#logging-levels  ###",
 				"#inf0#": "### HANDLERS YOU WISH TO USE FOR YOUR LOGGER. THE LOG LEVELS CAN BE FOUND ###",
@@ -93,6 +95,7 @@ class SettingsManager:
 				"#infc#": "###  WHAT IT DOES IS IT THAT IF YOU LOG SOMETHING WITH THE CHILD LOGGER,  ###",
 				"#inf.#": "### INHERIT ANOTHER LOGGER. IT WORKS LIKE THIS: grandparent.parent.child  ###",
 				"#infO#": "### HERE YOU SPECIFY THE LOGGER INSTANCES YOU WISH TO USE. A LOGGER CAN   ###",
+				"###O##": "#############################################################################",
 			},
 
 			"handlers": {
@@ -114,10 +117,12 @@ class SettingsManager:
 					}
 				},
 
+				"######": "#############################################################################",
 				"#infu#": "###            THE ARGUMENTS NEEDED TO CREATE A HANDLER OBJECT.           ###",
 				"#infO#": "### THE FORMATTER IS A NAME OF A FORMATTER INSTANCE. CONFIG CONSISTS OF   ###",
 				"#inf0#": "###   THE CLASS NAME OF THE HANDLER(FOUND IN cogs/DisLogger/Handlers.py)  ###",
 				"#info#": "### HERE YOU SPECIFY THE HANDLERS INSTANCES YOU WISH TO USE. THE TYPE IS  ###",
+				"###O##": "#############################################################################",
 
 			},
 
@@ -126,21 +131,28 @@ class SettingsManager:
 				"Discord": 	"```Markdown\n<%(asctime)-23s> <%(levelname)s>\n%(message)s\n```",
 				"SMS": 		"[%(asctime)s] %(levelname)-8s:\n%(message)s",
 
+				"######": "#############################################################################",
 				"#info#": "###    https://docs.python.org/3/library/logging.html#formatter-objects   ###",
 				"#infO#": "###                 FOR MORE INFORMATION, HEAD THERE:                     ###",
 				"#inf0#": "### THIS IS WHERE YOU SPECIFY THE FORMATTING INSTANCES FOR THE HANDLERS.  ###",
+				"###O##": "#############################################################################",
 			},
 
 			"twilio": {
 				"sid": 		"AC0d32c011d52f2f90123e7cda99b94757",
 				"secret": 	"c54b17c56fd10eb05ddd557078a5da44",
+
+				"######": "#############################################################################",
 				"#info#": "### YOU CAN CREATE A FREE ACCOUNT AT: https://www.twilio.com/try-twilio.  ###",
 				"#infO#": "###     THIS IS WHERE YOU SPECIFY YOUR TWILIO ACCOUNT API KEY VALUES.     ###",
+				"###O##": "#############################################################################",
 			},
 
+			"######": "#################################################################################",
 			"#info#": "###            KEYS AND MAKE YOUR APPLICATION BEHAVE AS YOU WISH.             ###",
 			"#infO#": "### THAT YOU CAN MODIFY. TO KNOW WHAT TO CHANGE, JUST LOOK AT OTHER '#info#'  ###",
 			"#inf0#": "###THIS IS THE CONFIG FILE FOR THE DISLOGGER APPLICATION. IT IS A SAMPLE FILE ###",
+			"###O##": "#################################################################################",
         }
 		self.__dataIO.save_json(self.__file_name, config)
 

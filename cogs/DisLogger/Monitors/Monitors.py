@@ -7,12 +7,20 @@ from scapy.all import ARP, arping
 class Monitor(abc.ABC):
 
 	def __init__(self, logger):
+		"""
+		Creates a new instance of Monitor with a logger. The implementation is
+		defined by the class' children.
+		:param logger: The logger to use while monitoring.
+		"""
 		self._logger = logger
 		self._is_monitoring = False
 		self._continue_monitor_token = False
 		self.monitoring_thread = Thread(target=self.monitoring_loop)
 
 	def start_monitoring(self):
+		"""
+		Starts the monitoring thread.
+		"""
 		self._logger.info("Started monitoring.")
 		self._continue_monitor_token = True
 		self.monitoring_thread.start()
@@ -20,6 +28,10 @@ class Monitor(abc.ABC):
 
 
 	def stop_monitoring(self):
+		"""
+		Sets the monitoring token to false, joins the monitoring thread and
+		gently logs that the monitoring process has ended.
+		"""
 		self._continue_monitor_token = False
 		self.monitoring_thread.join()
 		self._is_monitoring = False

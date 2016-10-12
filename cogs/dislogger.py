@@ -6,9 +6,6 @@ from discord.ext import commands
 
 from cogs.DisLogger.SettingsManager import SettingsManager
 
-#CONSTANTS
-CONFIG_FILE = "./data/DisLogger/config.json"
-
 
 class DisLogger:
 
@@ -18,7 +15,7 @@ class DisLogger:
 		:param bot:
 		"""
 
-		self.__SettingsManager = SettingsManager(CONFIG_FILE, bot)
+		self.__SettingsManager = SettingsManager(bot)
 		self.__SettingsManager.initiate()
 
 		self.bot = bot
@@ -33,8 +30,7 @@ class DisLogger:
 		self.is_currently_logging = True
 		for monitor_name, monitor_content in \
 				self.__SettingsManager.get_value("monitors").items():
-			self.monitors[monitor_name] = self.__SettingsManager.get_monitor(
-														monitor_content)
+			self.monitors[monitor_name] = self.__SettingsManager.get_monitor(monitor_content)
 
 		for monitorName, monitor in self.monitors.items():
 			monitor.start_monitoring()
@@ -43,8 +39,11 @@ class DisLogger:
 	@commands.command(pass_context=True)
 	async def stop_logging(self, context):
 		await self.bot.say("Stopping the monitoring system...")
-		for monitor in self.monitors.values():
+		for name, monitor in self.monitors.items():
+			await self.bot.say(
+				":arrows_counterclockwise: Stopping {} .".format(name))
 			monitor.stop_monitoring()
+			await self.bot.say(":arrow_down: {} Stopped monitoring.".format(name))
 		await self.bot.say(":white_check_mark: Stop monitoring systems done.")
 		self.is_currently_logging = False
 

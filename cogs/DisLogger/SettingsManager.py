@@ -8,7 +8,7 @@ import cogs.DisLogger.Handlers.Handlers as handlers
 
 class SettingsManager:
 
-	def __init__(self, file_name, bot):
+	def __init__(self, bot, file_name="./data/DisLogger/config.json"):
 		self.__file_name = file_name
 		self.__dataIO = DataIO()
 		self.__data = None
@@ -38,6 +38,11 @@ class SettingsManager:
 			self.__data = self.__dataIO.load_json(self.__file_name)
 
 	def __create_config_file(self):
+		if not os.path.exists(self.__file_name):
+			try:
+				os.makedirs(os.path.dirname(self.__file_name))
+			except OSError:
+				raise PermissionError("Cannot create directory /data/DisLogger.")
 		config = {
             "server": {
                 "id": "229390802344738817",
@@ -58,7 +63,12 @@ class SettingsManager:
 					"config": {
 						"ip": "10.60.9.128"
 					}
-				}
+				},
+
+				"#info#": "###         THE ARGUMENT NEEDED TO CREATE AN INSTANCE OF 'TYPE'.          ###",
+				"#inf0#": "### THINGS. THE TYPE IS THE NAME OF THE MONITOR CLASS, AND CONFIG CONTAINS###",
+				"#infu#": "### RUNS IN A SEPARATE THREAD AND IS WHAT CALLS THE LOGGER TO ACTUALLY LOG###",
+				"#infO#": "### HERE YOU SPECIFY THE INSTANCES OF MONITORS YOU WISH TO USE. A MONITOR ###",
             },
 
 			"loggers": {
@@ -76,13 +86,13 @@ class SettingsManager:
 					}
 				},
 
-				"#infO#": "### HERE YOU SPECIFY THE LOGGER INSTANCES YOU WISH TO USE. A LOGGER CAN   ###",
-				"#inf.#": "### INHERIT ANOTHER LOGGER. IT WORKS LIKE THIS: grandparent.parent.child  ###",
-				"#infc#": "###  WHAT IT DOES IS IT THAT IF YOU LOG SOMETHING WITH THE CHILD LOGGER,  ###",
-				"#infq#": "### IT WILL ALSO LOG USING ITS PARENTS. YOU ALSO SPECIFY THE INSTANCES OF ###",
-				"#inf0#": "### HANDLERS YOU WISH TO USE FOR YOUR LOGGER. THE LOG LEVELS CAN BE FOUND ###",
+				"#info#": "###            IF YOU DON'T KNOW WHAT IT IS, KEEP IT AT 20.               ###",
 				"#inf*#": "###  HERE: https://docs.python.org/3/library/logging.html#logging-levels  ###",
-				"#info#": "###            IF YOU DONT KNOW WHAT IT IS, KEEP IT AT 20.                ###",
+				"#inf0#": "### HANDLERS YOU WISH TO USE FOR YOUR LOGGER. THE LOG LEVELS CAN BE FOUND ###",
+				"#infq#": "### IT WILL ALSO LOG USING ITS PARENTS. YOU ALSO SPECIFY THE INSTANCES OF ###",
+				"#infc#": "###  WHAT IT DOES IS IT THAT IF YOU LOG SOMETHING WITH THE CHILD LOGGER,  ###",
+				"#inf.#": "### INHERIT ANOTHER LOGGER. IT WORKS LIKE THIS: grandparent.parent.child  ###",
+				"#infO#": "### HERE YOU SPECIFY THE LOGGER INSTANCES YOU WISH TO USE. A LOGGER CAN   ###",
 			},
 
 			"handlers": {
@@ -141,10 +151,11 @@ class SettingsManager:
 		:param key: The key to query.
 		:return: The value of the key.
 		"""
-		return_value = self.__data[key]
-		for key in return_value:
-			if key[:4] == "#inf":
-				del(return_value[key])
+		uncleaned_data = self.__data[key]
+		return_value = {}
+		for key, value in uncleaned_data.items():
+			if key[:4] != "#inf":
+				return_value[key] = value
 		return return_value
 
 	def set_value(self, key, value):
@@ -154,7 +165,7 @@ class SettingsManager:
 		"""
 		Returns an instance of monitor['type'], instantiated with the arguments
 		set in monitor['config'].
-		:param monitor: A JSon object containing at least 'type'
+		:param monitor: A JSon object containing at least 'type', 'logger'
 		and 'config'.
 		:return: An instance of a monitor, as requested by monitor['type'].
 		"""

@@ -1,0 +1,117 @@
+{
+    "######" : "#################################################################################",
+    "#inf1#" : "###THIS IS THE CONFIG FILE FOR THE DISLOGGER APPLICATION. IT IS A SAMPLE FILE ###",
+    "#inf2#" : "### THAT YOU CAN MODIFY. TO KNOW WHAT TO CHANGE, JUST LOOK AT OTHER '#info#'  ###",
+    "#inf3#" : "###            KEYS AND MAKE YOUR APPLICATION BEHAVE AS YOU WISH.             ###",
+    "####9#" : "#################################################################################",
+    "formatters" : {
+        "######" : "#############################################################################",
+        "#inf1#" : "### THIS IS WHERE YOU SPECIFY THE FORMATTING INSTANCES FOR THE HANDLERS.  ###",
+        "#inf2#" : "###                 FOR MORE INFORMATION, HEAD THERE:                     ###",
+        "#inf3#" : "###    https://docs.python.org/3/library/logging.html#formatter-objects   ###",
+        "####9#" : "#############################################################################",
+        "Discord" : "```Markdown\n<%(asctime)-23s> <%(levelname)s>\n%(message)s\n```",
+        "Main" : "[%(asctime)s] %(levelname)-8s->%(message)s",
+        "SMS" : "[%(asctime)s] %(levelname)-8s:\n%(message)s"
+    },
+    "handlers" : {
+        "######" : "#############################################################################",
+        "#inf1#" : "### HERE YOU SPECIFY THE HANDLERS INSTANCES YOU WISH TO USE. THE TYPE IS  ###",
+        "#inf2#" : "###   THE CLASS NAME OF THE HANDLER(FOUND IN cogs/DisLogger/Handlers.py)  ###",
+        "#inf3#" : "### THE FORMATTER IS A NAME OF A FORMATTER INSTANCE. CONFIG CONSISTS OF   ###",
+        "#inf4#" : "###            THE ARGUMENTS NEEDED TO CREATE A HANDLER OBJECT.           ###",
+        "####9#" : "#############################################################################",
+        "DiscordHandlerGeneral" : {
+            "config" : {
+                "channel_id" : "229391297754955797",
+                "log_level" : 20
+            },
+            "formatter" : "Discord",
+            "type" : "DiscordHandler"
+        },
+        "DiscordHandlerOtherChannel" : {
+            "config" : {
+                "channel_id" : "233016092816048128",
+                "log_level" : 20
+            },
+            "formatter" : "Discord",
+            "type" : "DiscordHandler"
+        },
+        "MainHandler" : {
+            "config" : {
+                "log_level" : 10
+            },
+            "formatter" : "Main",
+            "type" : "StreamHandler"
+        },
+        "RezoHandler" : {
+            "config" : {
+                "log_level" : 10,
+                "host" : "127.0.0.1",
+                "port" : "8002"
+            },
+            "formatter" : "Main",
+            "type" : "SocketHandler"
+        }
+    },
+    "loggers" : {
+        "######" : "#############################################################################",
+        "#inf1#" : "### HERE YOU SPECIFY THE LOGGER INSTANCES YOU WISH TO USE. A LOGGER CAN   ###",
+        "#inf2#" : "### INHERIT ANOTHER LOGGER. IT WORKS LIKE THIS: grandparent.parent.child  ###",
+        "#inf3#" : "###  WHAT IT DOES IS IT THAT IF YOU LOG SOMETHING WITH THE CHILD LOGGER,  ###",
+        "#inf4#" : "### IT WILL ALSO LOG USING ITS PARENTS. YOU ALSO SPECIFY THE INSTANCES OF ###",
+        "#inf5#" : "### HANDLERS YOU WISH TO USE FOR YOUR LOGGER. THE LOG LEVELS CAN BE FOUND ###",
+        "#inf6#" : "###  HERE: https://docs.python.org/3/library/logging.html#logging-levels  ###",
+        "#inf7#" : "###            IF YOU DON'T KNOW WHAT IT IS, KEEP IT AT 20.               ###",
+        "####9#" : "#############################################################################",
+        "main" : {
+            "handlers" : {
+                "handler1" : "DiscordHandlerGeneral"
+            },
+            "log_level" : 20
+        },
+        "main.test" : {
+            "handlers" : {
+                "handler1" : "DiscordHandlerOtherChannel"
+            },
+            "log_level" : 20
+        },
+        "rezo" : {
+            "handlers" : {
+                "handler1" : "RezoHandler",
+                "handler2" : "DiscordHandlerOtherChannel"
+            },
+            "log_level" : 20
+        }
+    },
+    "monitors" : {
+        "######" : "#############################################################################",
+        "#inf1#" : "### HERE YOU SPECIFY THE INSTANCES OF MONITORS YOU WISH TO USE. A MONITOR ###",
+        "#inf2#" : "### RUNS IN A SEPARATE THREAD AND IS WHAT CALLS THE LOGGER TO ACTUALLY LOG###",
+        "#inf3#" : "### THINGS. THE TYPE IS THE NAME OF THE MONITOR CLASS, AND CONFIG CONTAINS###",
+        "#inf4#" : "###         THE ARGUMENT NEEDED TO CREATE AN INSTANCE OF 'TYPE'.          ###",
+        "####9#" : "#############################################################################",
+        "TestMonitor1" : {
+            "config" : {
+              "ip": "127.0.0.1"
+            },
+            "logger" : "main.test",
+            "type" : "ARPMonitor"
+        }
+    },
+    "server" : {
+        "######" : "#############################################################################",
+        "#inf1#" : "###         THIS IS WHERE YOU SPECIFY YOUR DISCORD SERVER INFOS.          ###",
+        "####9#" : "#############################################################################",
+        "id" : "229390802344738817",
+        "main_channel_name" : "general"
+    },
+    "twilio" : {
+        "######" : "#############################################################################",
+        "#inf1#" : "###     THIS IS WHERE YOU SPECIFY YOUR TWILIO ACCOUNT API KEY VALUES.     ###",
+        "#inf2#" : "### YOU CAN CREATE A FREE ACCOUNT AT: https://www.twilio.com/try-twilio.  ###",
+        "####9#" : "#############################################################################",
+        "secret" : "c54b17c56fd10eb05ddd557078a5da44",
+        "sid" : "AC0d32c011d52f2f90123e7cda99b94757"
+    }
+}

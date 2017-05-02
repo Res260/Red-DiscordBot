@@ -4,7 +4,13 @@ import calendar
 import time
 from scapy.all import ARP, arping
 
+
 class Monitor(abc.ABC):
+	"""
+	Abstract class that defines a monitor for the application.
+	A monitor runs in a separated thread and calls its logger.
+	"""
+
 
 	def __init__(self, logger):
 		"""
@@ -16,6 +22,7 @@ class Monitor(abc.ABC):
 		self._is_monitoring = False
 		self._continue_monitor_token = False
 		self.monitoring_thread = Thread(target=self.monitoring_loop)
+
 
 	def start_monitoring(self):
 		"""
@@ -39,6 +46,10 @@ class Monitor(abc.ABC):
 
 	@abc.abstractmethod
 	def monitoring_loop(self):
+		"""
+		The loop that is runned in a separate Thread. Implementation is left to the
+		child class.
+		"""
 		pass
 
 	def is_monitoring(self):
@@ -47,9 +58,19 @@ class Monitor(abc.ABC):
 		"""
 		return self._is_monitoring
 
+
 class ARPMonitor(Monitor):
+	"""
+	Monitor class that uses the arp protocol to ping an ip, and logs
+	whether the ip is there or not.
+	"""
 
 	def __init__(self, logger=None, ip=None):
+		"""
+		Creates a new instance of ARPMonitor.
+		:param logger: The logger of the monitor.
+		:param ip: The ip to arping.
+		"""
 		super(ARPMonitor, self).__init__(logger)
 		self.logger = logger
 		self.ip = ip
@@ -83,7 +104,8 @@ class ARPMonitor(Monitor):
 	def __is_there(self):
 		"""
 		SIDE EFFECT ON self.__last_sign
-		:return:
+		:return: True if the ip responded at least once in 
+		         the last self.__last_sign seconds. 
 		"""
 		current_time = calendar.timegm(time.gmtime())
 		is_there = True
@@ -95,6 +117,10 @@ class ARPMonitor(Monitor):
 		return is_there
 
 	def __is_connected(self):
+		"""
+		Sends an arping request to self.ip.
+		:return: True if a response from self.ip was received.
+		"""
 		is_connected = False
 		answers, uns = arping(self.ip + "/32", timeout=1, verbose=False)
 		for answer in answers:

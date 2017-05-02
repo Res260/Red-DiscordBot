@@ -21,6 +21,9 @@ class DisLogger:
 		self.bot = bot
 		self.is_currently_logging = False
 		self.monitors = {}
+		self.app_logger = log.getLogger("app")
+		self.app_logger.addHandler(log.StreamHandler())
+		self.app_logger.info("App Logger initialized.")
 
 	@commands.command(pass_context=True)
 	async def start_logging(self):

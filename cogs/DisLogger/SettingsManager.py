@@ -1,16 +1,27 @@
 import logging as log
+import os
 
-from cogs.utils.dataIO import *
-from cogs.utils.dataIO import DataIO
+import cogs.utils.dataIO as dataIO
+import shutil
 import cogs.DisLogger.Monitors.Monitors as monitors
 import cogs.DisLogger.Handlers.Handlers as handlers
 
 
 class SettingsManager:
+	"""
+	Class that manages the settings file for the application.
+	"""
 
-	def __init__(self, bot, file_name="./data/DisLogger/config.json"):
-		self.__file_name = file_name
-		self.__dataIO = DataIO()
+	DEFAULT_CONFIG_PATH = "./cogs/DisLogger/config_default.json"
+
+	def __init__(self, bot, config_file_path="./data/DisLogger/config.json"):
+		"""
+		Creates a new instance of SettingsManager.
+		:param bot: The Discord bot instance for the application. 
+		:param config_file_path: The path of the config file of the application.
+		"""
+		self.__config_file_path = config_file_path
+		self.__dataIO = dataIO.DataIO()
 		self.__data = None
 		self.__bot = bot
 
@@ -20,11 +31,11 @@ class SettingsManager:
 		the config file is okay, as well as the rights to access. Loads the JSon
 		in the class.
 		"""
-		if not os.path.isfile(self.__file_name):
-			self.__create_config_file()
-		if not self.__dataIO.is_valid_json(self.__file_name):
+		if not os.path.isfile(self.__config_file_path):
+			self.__copy_default_config_file()
+		if not self.__dataIO.is_valid_json(self.__config_file_path):
 			try:
-				os.rename(self.__file_name, self.__file_name + "_corrupted")
+				os.rename(self.__config_file_path, self.__config_file_path + "_corrupted")
 			except:
 				raise PermissionError("ERROR: Make sure to run the program as an"
 									  " administrator. File access right is "
@@ -32,129 +43,23 @@ class SettingsManager:
 			print("Config file is corrupted. Make sure the file is either "
 				  "accessible or that it's content is valid JSON. The file as "
 				  "been renamed to {} and a new one has been"
-				  "created.".format(self.__file_name + "_corrupted"))
+				  "created.".format(self.__config_file_path + "_corrupted"))
 			exit(1)
 		else:
-			self.__data = self.__dataIO.load_json(self.__file_name)
+			self.__data = self.__dataIO.load_json(self.__config_file_path)
 
-	def __create_config_file(self):
-		if not os.path.exists(self.__file_name):
+	def __copy_default_config_file(self):
+		"""
+		Copies the default config file to use as the config file for the application.
+		"""
+		if not os.path.exists(os.path.dirname(self.__config_file_path)):
 			try:
-				os.makedirs(os.path.dirname(self.__file_name))
+				os.makedirs(os.path.dirname(self.__config_file_path))
 			except OSError:
-				raise PermissionError("Cannot create directory /data/DisLogger.")
-		config = {
-            "server": {
-                "id": "229390802344738817",
-                "main_channel_name": "general"
-            },
-            "monitors": {
-                "ARPMonitor1": {
-                    "type": 	"ARPMonitor",
-					"logger": 	"main",
-                    "config": {
-                        "ip": "192.168.0.140"
-                    }
-                },
+				raise PermissionError("Cannot create directory for {}."
+									      .format(self.__config_file_path))
 
-				"ARPMonitorGui": {
-					"type": 	"ARPMonitor",
-					"logger": 	"main.test",
-					"config": {
-						"ip": "10.60.9.128"
-					}
-				},
-
-				"######": "#############################################################################",
-				"#info#": "###         THE ARGUMENT NEEDED TO CREATE AN INSTANCE OF 'TYPE'.          ###",
-				"#inf0#": "### THINGS. THE TYPE IS THE NAME OF THE MONITOR CLASS, AND CONFIG CONTAINS###",
-				"#infu#": "### RUNS IN A SEPARATE THREAD AND IS WHAT CALLS THE LOGGER TO ACTUALLY LOG###",
-				"#infO#": "### HERE YOU SPECIFY THE INSTANCES OF MONITORS YOU WISH TO USE. A MONITOR ###",
-				"###O##": "#############################################################################",
-            },
-
-			"loggers": {
-				"main": {
-					"log_level": 20,
-					"handlers": {
-						"handler1": "DiscordHandlerGeneral"
-					}
-				},
-
-				"main.test": {
-					"log_level": 20,
-					"handlers": {
-						"handler1": "DiscordHandlerOtherChannel"
-					}
-				},
-				"######": "#############################################################################",
-				"#info#": "###            IF YOU DON'T KNOW WHAT IT IS, KEEP IT AT 20.               ###",
-				"#inf*#": "###  HERE: https://docs.python.org/3/library/logging.html#logging-levels  ###",
-				"#inf0#": "### HANDLERS YOU WISH TO USE FOR YOUR LOGGER. THE LOG LEVELS CAN BE FOUND ###",
-				"#infq#": "### IT WILL ALSO LOG USING ITS PARENTS. YOU ALSO SPECIFY THE INSTANCES OF ###",
-				"#infc#": "###  WHAT IT DOES IS IT THAT IF YOU LOG SOMETHING WITH THE CHILD LOGGER,  ###",
-				"#inf.#": "### INHERIT ANOTHER LOGGER. IT WORKS LIKE THIS: grandparent.parent.child  ###",
-				"#infO#": "### HERE YOU SPECIFY THE LOGGER INSTANCES YOU WISH TO USE. A LOGGER CAN   ###",
-				"###O##": "#############################################################################",
-			},
-
-			"handlers": {
-				"DiscordHandlerGeneral": {
-					"type": 	"DiscordHandler",
-					"formatter":"Discord",
-					"config": {
-						"log_level": 	20,
-						"channel_id": 	"229391297754955797"
-					}
-				},
-
-				"DiscordHandlerOtherChannel": {
-					"type": "DiscordHandler",
-					"formatter": "Discord",
-					"config": {
-						"log_level": 20,
-						"channel_id": "233016092816048128"
-					}
-				},
-
-				"######": "#############################################################################",
-				"#infu#": "###            THE ARGUMENTS NEEDED TO CREATE A HANDLER OBJECT.           ###",
-				"#infO#": "### THE FORMATTER IS A NAME OF A FORMATTER INSTANCE. CONFIG CONSISTS OF   ###",
-				"#inf0#": "###   THE CLASS NAME OF THE HANDLER(FOUND IN cogs/DisLogger/Handlers.py)  ###",
-				"#info#": "### HERE YOU SPECIFY THE HANDLERS INSTANCES YOU WISH TO USE. THE TYPE IS  ###",
-				"###O##": "#############################################################################",
-
-			},
-
-			"formatters": {
-				"Main": 	"[%(asctime)s] %(levelname)-8s->%(message)s",
-				"Discord": 	"```Markdown\n<%(asctime)-23s> <%(levelname)s>\n%(message)s\n```",
-				"SMS": 		"[%(asctime)s] %(levelname)-8s:\n%(message)s",
-
-				"######": "#############################################################################",
-				"#info#": "###    https://docs.python.org/3/library/logging.html#formatter-objects   ###",
-				"#infO#": "###                 FOR MORE INFORMATION, HEAD THERE:                     ###",
-				"#inf0#": "### THIS IS WHERE YOU SPECIFY THE FORMATTING INSTANCES FOR THE HANDLERS.  ###",
-				"###O##": "#############################################################################",
-			},
-
-			"twilio": {
-				"sid": 		"AC0d32c011d52f2f90123e7cda99b94757",
-				"secret": 	"c54b17c56fd10eb05ddd557078a5da44",
-
-				"######": "#############################################################################",
-				"#info#": "### YOU CAN CREATE A FREE ACCOUNT AT: https://www.twilio.com/try-twilio.  ###",
-				"#infO#": "###     THIS IS WHERE YOU SPECIFY YOUR TWILIO ACCOUNT API KEY VALUES.     ###",
-				"###O##": "#############################################################################",
-			},
-
-			"######": "#################################################################################",
-			"#info#": "###            KEYS AND MAKE YOUR APPLICATION BEHAVE AS YOU WISH.             ###",
-			"#infO#": "### THAT YOU CAN MODIFY. TO KNOW WHAT TO CHANGE, JUST LOOK AT OTHER '#info#'  ###",
-			"#inf0#": "###THIS IS THE CONFIG FILE FOR THE DISLOGGER APPLICATION. IT IS A SAMPLE FILE ###",
-			"###O##": "#################################################################################",
-        }
-		self.__dataIO.save_json(self.__file_name, config)
+		shutil.copy(self.DEFAULT_CONFIG_PATH, self.__config_file_path)
 
 	def get_value(self, key):
 		"""
@@ -166,12 +71,17 @@ class SettingsManager:
 		uncleaned_data = self.__data[key]
 		return_value = {}
 		for key, value in uncleaned_data.items():
-			if key[:4] != "#inf":
+			if key[:4] != "#inf" and key[:4] != "####" :
 				return_value[key] = value
 		return return_value
 
 	def set_value(self, key, value):
-		set_value(self.__file_name, key, value)
+		"""
+		Sets the value of key to value in the config file.
+		:param key: Parameter to set.
+		:param value: Value of the parameter
+		"""
+		dataIO.set_value(self.__config_file_path, key, value)
 
 	def get_monitor(self, monitor):
 		"""

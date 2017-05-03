@@ -3,6 +3,7 @@ from threading import Thread
 import calendar
 import time
 from scapy.all import ARP, arping
+import psutil
 
 
 class Monitor(abc.ABC):
@@ -127,3 +128,85 @@ class ARPMonitor(Monitor):
 			if answer[1].getlayer(ARP).psrc == self.ip:
 				is_connected = True
 		return is_connected
+
+class RAMMonitor(Monitor):
+	"""
+	Monitor class that monitors the RAM usage.
+	"""
+
+	def __init__(self, logger=None, log_interval= 3, warn_at=None):
+		"""
+		Creates a new instance of CPUMonitor.
+		:param logger: The logger of the monitor.
+		:param log_interval: The interval between each log (in seconds).
+		:param warn_at: The threshold (in %) of RAM usage before the logger logs with "warn"
+		                instead of "info".
+		"""
+		super(RAMMonitor, self).__init__(logger)
+		self.logger = logger
+		self.log_interval = log_interval
+		self.BYTES_IN_A_MEGABYTE = 1024 * 1024
+		if not warn_at:
+			warn_at = 5
+		self.warn_at = warn_at
+
+	def monitoring_loop(self):
+		"""
+		The threaded loop to monitor RAM usage.
+		"""
+
+		while self._continue_monitor_token:
+			virtual_memory = psutil.virtual_memory()
+			log_message = "RAM usage: {}mo/{}mo | {}mo left | {}%"\
+							.format(round(virtual_memory.used / self.BYTES_IN_A_MEGABYTE, 2),
+									round(virtual_memory.total / self.BYTES_IN_A_MEGABYTE, 2),
+									round(virtual_memory.available / self.BYTES_IN_A_MEGABYTE, 2),
+									virtual_memory.percent)
+			if virtual_memory.percent >= self.warn_at * 100:
+				self.logger.info(log_message)
+			else:
+				self.logger.warning(log_message)
+			time.sleep(self.log_interval)
+
+class CPUMonitor(Monitor):
+	"""
+	Monitor class that monitors the CPU usage.
+	"""
+
+	def __init__(self, logger=None, log_interval= 3, warn_at=None):
+		"""
+		Creates a new instance of CPUMonitor.
+		:param logger: The logger of the monitor.
+		:param log_interval: The interval between each log (in seconds).
+		:param warn_at: The threshold (in %) of CPU usage before the logger logs with "warn"
+		                instead of "info".
+		"""
+		super(CPUMonitor, self).__init__(logger)
+		self.logger = logger
+		self.warn_at = warn_at
+		self.log_interval = log_interval
+		if not warn_at:
+			warn_at = 5
+		self.warn_at = warn_at
+
+	def monitoring_loop(self):
+		"""
+		The threaded loop to monitor CPU usage.
+		"""
+
+		while self._continue_monitor_token:
+			do_warn = False
+			cpu_percentages = psutil.cpu_percent(percpu=True)
+			log_message = "CPU usage ({} cores):".format(cpu_percentages.__len__())
+
+			for core_number, cpu_percentage in zip(range(0, cpu_percentages.__len__()), cpu_percentages):
+				log_message += "\nCore {}: {}%".format(core_number, cpu_percentage)
+				if cpu_percentage >= self.warn_at * 100:
+					do_warn = True
+					log_message += "***"
+
+			if not do_warn:
+				self.logger.info(log_message)
+			else:
+				self.logger.warning(log_message)
+			time.sleep(self.log_interval)

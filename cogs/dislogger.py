@@ -30,14 +30,17 @@ class DisLogger:
 		"""
 		Starts the logging process.
 		"""
+		self.app_logger.info("start_logging called.")
 		self.is_currently_logging = True
 		for monitor_name, monitor_content in \
 				self.__SettingsManager.get_value("monitors").items():
+			self.app_logger.info("Setting up monitor: {}".format(monitor_name))
 			self.monitors[monitor_name] = self.__SettingsManager.get_monitor(monitor_content)
 
-		for monitorName, monitor in self.monitors.items():
+		for monitor_name, monitor in self.monitors.items():
+			self.app_logger.info("Starting monitor: {}".format(monitor_name))
 			monitor.start_monitoring()
-			await self.bot.say(":up: " + monitorName + " started monitoring.")
+			await self.bot.say(":up: {} started monitoring.".format(monitor_name))
 
 	@commands.command(pass_context=True)
 	async def stop_logging(self, context):
